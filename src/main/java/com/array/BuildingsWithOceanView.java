@@ -7,7 +7,7 @@ public class BuildingsWithOceanView {
     public static void main(String[] args) {
         int[] heights = {4, 2, 3, 2, 1};
         int[] res = new BuildingsWithOceanView().findBuildings(heights);
-        for (int i = 0; i < res.length; i++) {
+        for(int i = 0; i < res.length; i++) {
             System.out.print(res[i] + " ");
         }
     }
