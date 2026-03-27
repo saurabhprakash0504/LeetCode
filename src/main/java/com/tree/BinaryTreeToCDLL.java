@@ -23,8 +23,6 @@ public class BinaryTreeToCDLL {
             head.left= prev;
             prev.right=head;
             return head;
-
-
         }
 
 

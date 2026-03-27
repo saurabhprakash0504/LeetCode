@@ -24,18 +24,18 @@ public class MaxWidthOfABinaryTree {
 
     }
 
-    static HashMap<Integer, Integer> map = new HashMap<>();
+        static HashMap<Integer, Integer> map = new HashMap<>();
 
-    static void maxWidth(Node root, int level) {
+        static void maxWidth(Node root, int level) {
 
-        if (root == null) {
-            return;
+            if (root == null) {
+                return;
+            }
+
+            maxWidth(root.left, level + 1);
+           // map.merge(level, 1, Integer::sum);
+            maxWidth(root.right, level + 1);
+            map.merge(level, 1, Integer::sum);
+
         }
-
-        maxWidth(root.left, level + 1);
-       // map.merge(level, 1, Integer::sum);
-        maxWidth(root.right, level + 1);
-        map.merge(level, 1, Integer::sum);
-
-    }
 }

@@ -35,17 +35,20 @@ public class BasicCalculator2 {
                         break;
                     case '-':
                         res = res - curr;
+                        //check here prevVal = -curr
                         prevVal = -curr;
                         break;
                     case '*':
                         res = res - prevVal;
                         res = res + (prevVal * curr);
-                        prevVal = curr * prevVal;
+                        //check here prevVal = prevVal * curr
+                        prevVal = prevVal * curr;
                         break;
                     case '/':
                         res = res - prevVal;
-                        res = res + (int) (prevVal / curr);
-                        prevVal = (int) (prevVal / curr);
+                        res = res + prevVal / curr;
+                        //check here prevVal = prevVal / curr
+                        prevVal = prevVal / curr;
                         break;
                 }
             } else if (c == ' ') {
@@ -59,66 +62,5 @@ public class BasicCalculator2 {
         return res;
 
     }
-
-    public int calculate(String s) {
-        int i = 0;
-        int len = s.length();
-
-        int prev = 0;
-        int res = 0;
-        char prev_opr = '+';
-
-
-        while (i < len) {
-            int curr = 0;
-            char c = s.charAt(i);
-            if (Character.isDigit(c)) {
-
-                while (i < len && Character.isDigit(s.charAt(i))) {
-                    int tem = s.charAt(i) - '0';
-                    curr = curr * 10 + tem;
-                    i++;
-                }
-                i--;
-
-                switch (prev_opr) {
-
-                    case '+':
-                        res = res + curr;
-                        prev = curr;
-                        break;
-                    case '-':
-                        res = res - curr;
-                        prev = -curr;
-                        break;
-                    case '*':
-
-                        res = res - prev;
-                        res = res + (prev * curr);
-                        prev = curr * prev;
-                        break;
-
-                    case '/':
-                        res = res - prev;
-                        res = res + (int) (prev / curr);
-                        prev = (int) (prev / curr);
-                        break;
-                }
-
-                i++;
-
-            } else if (c == ' ') {
-                i++;
-            } else {
-                prev_opr = c;
-                i++;
-            }
-
-        }
-
-        return res;
-
-    }
-
 
 }
