@@ -19,52 +19,57 @@ public class MaximumWidthOfBinaryTree {
     }
 
     public int widthOfBinaryTree(Node root) {
+
+        int max = Integer.MIN_VALUE;
         Queue<Node8> q = new LinkedList<>();
         q.add(new Node8(root, 0));
         q.add(null);
 
-        int max = 0;
-        int start = -1;  // track first node index of current level
-        int end = 0;
-
+        int s = 0;
+        int e = 0;
+        int min = 0;
         while (q.size() > 1) {
-            Node8 poll = q.poll();
+            Node8 p = q.poll();
+            if (p == null) {
+                int curr = e - s + 1;
+                max = Integer.max(max, curr);
 
-            if (poll == null) {
-                int curr = end - start + 1;
-                max = Math.max(curr, max);
-
-                start = -1; // reset for next level
+                if (q.size() >= 1) {
+                    min = q.peek().val;
+                    s = q.peek().val - min;
+                    e = q.peek().val - min;
+                }
                 q.add(null);
             } else {
-                if (start == -1) start = poll.wid; // first node of this level
+                e = p.val - min;
 
-                end = poll.wid;
-
-                if (poll.root.left != null) {
-                    int val = 2 * poll.wid + 1;
-                    q.add(new Node8(poll.root.left, val));
+                if (p.n.left != null) {
+                    q.add(new Node8(p.n.left, 2 * p.val + 1));
                 }
 
-                if (poll.root.right != null) {
-                    int val = 2 * poll.wid + 2;
-                    q.add(new Node8(poll.root.right, val));
+                if (p.n.right != null) {
+                    q.add(new Node8(p.n.right, 2 * p.val + 2));
                 }
             }
+
+
         }
 
-        int curr = end - start + 1;
-        max = Math.max(curr, max);
+        int curr = e - s + 1;
+        max = Integer.max(max, curr);
+
         return max;
+
+
     }
 }
 
-class Node8{
-    Node root;
-    int wid;
+class Node8 {
+    Node n;
+    int val;
 
-    Node8(Node r, int w){
-        root = r;
-        wid = w;
+    Node8(Node r, int w) {
+        n = r;
+        val = w;
     }
 }
