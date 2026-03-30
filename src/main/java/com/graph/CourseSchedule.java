@@ -5,8 +5,12 @@ import java.util.ArrayList;
 public class CourseSchedule {
 
     public static void main(String[] args) {
+        int numCourses = 2;
+        int[][] prerequisites = {{1,0}};
 
-
+        CourseSchedule obj = new CourseSchedule();
+        boolean res = obj.canFinish(numCourses, prerequisites);
+        System.out.println(res);
 
     }
 
