@@ -25,5 +25,8 @@ public class CodeRelay {
             System.out.println(list2.get(i));
         }
 
+        int i = 2000 * 2000;
+        System.out.println(i);
+
     }
 }
