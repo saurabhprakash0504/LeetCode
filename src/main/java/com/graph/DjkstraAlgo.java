@@ -9,82 +9,70 @@ public class DjkstraAlgo {
     public static void main(String[] args) {
         int V = 3;
         int src = 2;
-        //int[][] edge = {{0, 1, 5}, {1, 2, 3}, {0, 2, 1}};
 
-        int[][] edge = {{0, 1, 1}, {1, 2, 3}, {0, 2, 6}};
+        int[][] edges = {
+                {0, 1, 1},
+                {1, 2, 3},
+                {0, 2, 6}
+        };
 
-        int[] ans = dijkstra(V, edge, src);
-
-        System.out.println(Arrays.toString(ans));
-
+        int[] dist = dijkstra(V, edges, src);
+        System.out.println(Arrays.toString(dist));
     }
 
     public static int[] dijkstra(int V, int[][] edges, int src) {
-        // code here
-        ArrayList<ArrayList<int[]>> al = new ArrayList<ArrayList<int[]>>();
 
-
+        // STEP 1: Build adjacency list
+        List<List<Sol>> graph = new ArrayList<>();
         for (int i = 0; i < V; i++) {
-            al.add(i, new ArrayList());
+            graph.add(new ArrayList<>());
         }
 
-        for (int i = 0; i < edges.length; i++) {
-            ArrayList<int[]> l = al.get(edges[i][0]);
-            int[] ab = {edges[i][1], edges[i][2]};
-            l.add(ab);
-            ArrayList<int[]> l2 = al.get(edges[i][1]);
-            int[] ab2 = {edges[i][0], edges[i][2]};
-            l2.add(ab2);
+        for (int[] e : edges) {
+            int u = e[0], v = e[1], w = e[2];
+            graph.get(u).add(new Sol(v, w));
+            graph.get(v).add(new Sol(u, w)); // undirected
         }
 
-        PriorityQueue<Sol> queue = new PriorityQueue<>((u, v) -> u.wt - v.wt);
-        int[] arr = new int[V];
-        for (int i = 0; i < arr.length; i++) {
-            arr[i] = Integer.MAX_VALUE;
-        }
+        // STEP 2: Distance array
+        int[] dist = new int[V];
+        Arrays.fill(dist, Integer.MAX_VALUE);
+        dist[src] = 0;
 
-        arr[src] = 0;
+        // STEP 3: Min-heap (priority queue)
+        PriorityQueue<Sol> pq = new PriorityQueue<>((a, b) -> a.weight - b.weight);
+        pq.add(new Sol(src, 0));
 
-        queue.add(new Sol(0, src));
-        while (!queue.isEmpty()) {
-            Sol curr = queue.poll();
-            int wt = curr.wt;
-            int node = curr.node;
+        // STEP 4: Dijkstra loop
+        while (!pq.isEmpty()) {
+            Sol curr = pq.poll();
+            int node = curr.vertex;
+            int currDist = curr.weight;
 
-            /*for(int i=0;i< edges.length;i++){
-                if(edges[i][0] == node){
-                    if(arr[edges[i][1]] > (edges[i][2] + wt)){
-                        arr[edges[i][1]] = (edges[i][2] + wt);
-                        queue.add(new Sol(edges[i][2] + wt, edges[i][1]));
-                    }
-                }else if( edges[i][1] == node){
-                    if(arr[edges[i][0]] > (edges[i][2] + wt)){
-                        arr[edges[i][0]] = (edges[i][2] + wt);
-                        queue.add(new Sol(edges[i][2] + wt, edges[i][0]));
-                    }
-                }
-            }*/
+            // Skip outdated entries
+            if (currDist > dist[node]) continue;
 
-            ArrayList<int[]> l3 = al.get(node);
-            for (int i = 0; i < l3.size(); i++) {
-                if (arr[l3.get(i)[0]] > (l3.get(i)[1] + wt)) {
-                    arr[l3.get(i)[0]] = (l3.get(i)[1] + wt);
-                    queue.add(new Sol(l3.get(i)[1] + wt, l3.get(i)[0]));
+            // Explore neighbours
+            for (Sol nei : graph.get(node)) {
+                int newDist = currDist + nei.weight;
+
+                if (newDist < dist[nei.vertex]) {
+                    dist[nei.vertex] = newDist;
+                    pq.add(new Sol(nei.vertex, newDist));
                 }
             }
-
         }
 
-        return arr;
+        return dist;
     }
 }
 
 class Sol {
-    int wt;
-    int node;
+    int weight;
+    int vertex;
 
-    Sol(int w, int n) {
-        wt = w;
-        node = n;
+    Sol(int n, int w) {
+        weight = w;
+        vertex = n;
     }
 }
