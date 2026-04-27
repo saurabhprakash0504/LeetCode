@@ -101,10 +101,10 @@ class Disjoint1 {
             return;
         } else if (size_par_u > size_par_v) {
             size.set(par_v, size_par_u + size_par_v);
-            parent.set(par_v, par_u);
+            parent.set(par_u, par_u);
         } else {
             size.set(par_u, size_par_v + size_par_u);
-            parent.set(par_u, par_v);
+            parent.set(par_v, par_v);
         }
 
 
