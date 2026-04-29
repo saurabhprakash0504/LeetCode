@@ -31,6 +31,7 @@ public class DisjointSet {
     }
 
     //Union By rank
+    //we update the size of parentU and parentV and not size of u and size of v
     void unionByRank(int u, int v) {
 
         int parentU = findUltimateParent(u);
@@ -54,7 +55,8 @@ public class DisjointSet {
     }
 
 
-    //Union By rank
+    //Union By size
+    //we update the size of parentU and parentV and not size of u and size of v
     void unionBySize(int u, int v) {
 
         int parentU = findUltimateParent(u);
