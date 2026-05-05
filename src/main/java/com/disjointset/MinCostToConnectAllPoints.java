@@ -50,9 +50,9 @@ public class MinCostToConnectAllPoints {
         int res = 0;
         for (Krus k : al) {
             Temp t = k.temp;
-            if (ds.findParent(t.u) != ds.findParent(t.v)) {
+            if (ds.findUltimateParent(t.u) != ds.findUltimateParent(t.v)) {
                 res = res + k.wt;
-                ds.findSize(t.u, t.v);
+                ds.unionBySize(t.u, t.v);
             }
         }
 

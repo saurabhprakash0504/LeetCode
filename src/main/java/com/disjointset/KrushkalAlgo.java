@@ -27,9 +27,9 @@ public class KrushkalAlgo {
         int res = 0;
         for (Krus k : al) {
             Temp t = k.temp;
-            if (ds.findParent(t.u) != ds.findParent(t.v)) {
+            if (ds.findUltimateParent(t.u) != ds.findUltimateParent(t.v)) {
                 res = res + k.wt;
-                ds.findSize(t.u, t.v);
+                ds.unionBySize(t.u, t.v);
             }
         }
 
@@ -52,39 +52,38 @@ class Disjoint {
     }
 
 
-    int findParent(int i) {
 
-        if (i == parent.get(i)) {
-            return i;
+    int findUltimateParent(int u){
+
+        if(u == parent.get(u)){
+            return u;
         }
 
-        int par = findParent(parent.get(i));
+        int p = findUltimateParent(parent.get(u));
+        parent.set(u, p);
 
-        parent.set(i, par);
+        return parent.get(u);
 
-        return parent.get(i);
+
     }
 
+    void unionBySize(int u, int v){
 
-    void findSize(int u, int v) {
+        int parent_u = findUltimateParent(u);
+        int parent_v = findUltimateParent(v);
 
-        int par_u = findParent(u);
-        int par_v = findParent(v);
+        int size_parent_u = size.get(parent_u);
+        int size_parent_v = size.get(parent_v);
 
-        int size_par_u = size.get(par_u);
-        int size_par_v = size.get(par_v);
-
-        if (par_u == par_v) {
+        if(parent_u == parent_v){
             return;
-        } else if (size_par_u > size_par_v) {
-            size.set(par_v, size_par_u + size_par_v);
-            parent.set(par_u, par_u);
-        } else {
-            size.set(par_u, size_par_v + size_par_u);
-            parent.set(par_v, par_v);
+        }else if(size_parent_u < size_parent_v){
+            parent.set(parent_u, parent_v);
+            size.set(parent_v, parent_v+parent_u);
+        }else {
+            parent.set(parent_v, parent_u);
+            size.set(parent_u, parent_v+parent_u);
         }
-
-
     }
 
 }
