@@ -14,56 +14,50 @@ public class WordBreak {
 
     public boolean wordBreak(String s, List<String> wordDict) {
         HashSet<String> set = new HashSet<>(wordDict);
+        // return find(s, 0, set);
         Boolean[] dp = new Boolean[s.length()];
         return findMem(s, 0, set, dp);
     }
 
-    boolean find(String s, int ind, HashSet<String> set) {
+    boolean find(String s, int startInd, HashSet<String> set) {
 
-        if (ind >= s.length()) {
+        if (startInd >= s.length()) {
             return true;
         }
 
-        if (set.contains(s.substring(ind))) {
+        if (set.contains(s.substring(startInd))) {
             return true;
         }
 
-        for (int i = ind + 1; i < s.length(); i++) {
-            // if(ind+i < s.length()){
-            String sub = s.substring(ind, i);
+        for (int i = startInd + 1; i < s.length(); i++) {
+
+            String sub = s.substring(startInd, i);
             if (set.contains(sub) && find(s, i, set)) {
                 return true;
             }
-            //  }
         }
 
         return false;
     }
 
 
-    boolean findMem(String s, int ind, HashSet<String> set, Boolean[] dp) {
+    boolean findMem(String s, int startInd, HashSet<String> set, Boolean[] dp) {
 
-        if (ind >= s.length()) {
+        if (startInd >= s.length()) {
             return true;
         }
 
-        if (set.contains(s.substring(ind))) {
-            return true;
+        if (dp[startInd] != null) {
+            return dp[startInd];
         }
 
-        if (dp[ind] != null) {
-            return dp[ind];
-        }
-
-        for (int i = ind + 1; i < s.length(); i++) {
-            // if(ind+i < s.length()){
-            String sub = s.substring(ind, i);
-            if (set.contains(sub) && findMem(s, i, set, dp)) {
-                return dp[ind] = true;
+        for (int endInd = startInd + 1; endInd <= s.length(); endInd++) {
+            String sub = s.substring(startInd, endInd);
+            if (set.contains(sub) && findMem(s, endInd, set, dp)) {
+                return dp[startInd] = true;
             }
-            //  }
         }
 
-        return dp[ind] = false;
+        return dp[startInd] = false;
     }
 }
