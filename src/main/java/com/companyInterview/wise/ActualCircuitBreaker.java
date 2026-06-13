@@ -114,80 +114,99 @@ public class ActualCircuitBreaker {
     //WE need to implement this logic in the `WebClient.execute(Request)` method. (CIRCUIT BREAKER)
     public Response execute(Request request) throws Exception {
 
-        CircuitBreaker cb = getBreaker(request.host);
         int now = getCurrentTimeInMinutes();
 
-        // -------------------------
-        // 1. HALF-OPEN STATE
-        // -------------------------
-        if (now == cb.openUntil) {
-            Response trial = request.call();
+        CircuitBreaker breaker = getBreaker(request.host);
 
-            if (trial.status == 200) {
-                cb.reset();
-                return trial;
-            } else {
-                cb.trip(now);
-                Response r = new Response();
-                r.status = 500;
-                return r;
-            }
+
+        if (breaker.isOpen(now)) {
+
+            // Circuit is OPEN — block the call
+
+            Response blocked = new Response();
+
+            blocked.status = 503;
+
+            blocked.body = "Circuit open for host: " + request.host;
+
+            return blocked;
+
         }
 
-        // -------------------------
-        // 2. OPEN STATE
-        // -------------------------
-        if (now < cb.openUntil) {
-            Response r = new Response();
-            r.status = 500;
-            return r;
+
+        // Circuit is CLOSED — make the actual call
+
+       Response response = request.call();
+
+
+        if (response.status == 500 /* or timeout */) {
+
+            breaker.recordFailure(now);
+
         }
 
-        // -------------------------
-        // 3. CLOSED STATE
-        // -------------------------
-        Response response = request.call();
-
-        if (response.status == 200) {
-            cb.cleanup(now);
-            return response;
-        }
-
-        // Failure
-        cb.recordFailure(now);
-
-        if (cb.failures.size() >= 3) {
-            cb.trip(now); // breaker opens AFTER returning this failure
-        }
 
         return response;
+
     }
+
 }
 
 class CircuitBreaker {
 
-    Queue<Integer> failures = new LinkedList<>();
-    int openUntil = -1; // -1 means CLOSED
+    private static final int FAILURE_THRESHOLD = 3;
 
-    void cleanup(int now) {
-        while (!failures.isEmpty() && now - failures.peek() > 10) {
-            failures.poll();
+    private static final int FAILURE_WINDOW_MINUTES = 10;
+
+    private static final int OPEN_DURATION_MINUTES = 5;
+
+
+    private final Queue<Integer> failureTimes = new LinkedList<>();
+
+    private Integer openedAtMinute = null;
+
+
+    public boolean isOpen(int currentMinute) {
+
+        if (openedAtMinute == null) return false;
+
+
+        if (currentMinute - openedAtMinute >= OPEN_DURATION_MINUTES) {
+
+            openedAtMinute = null;
+
+            failureTimes.clear();
+
+            return false;
+
         }
+
+        return true;
+
     }
 
-    void recordFailure(int now) {
-        failures.add(now);
-        cleanup(now);
+
+    public void recordFailure(int currentMinute) {
+
+        // Evict failures outside the 10-minute sliding window
+
+        while (!failureTimes.isEmpty() &&
+
+                currentMinute - failureTimes.peek() >= FAILURE_WINDOW_MINUTES) {
+
+            failureTimes.poll();
+
+        }
+
+        failureTimes.offer(currentMinute);
+
+
+        if (failureTimes.size() >= FAILURE_THRESHOLD) {
+
+            openedAtMinute = currentMinute;
+
+        }
+
     }
 
-    void trip(int now) {
-        openUntil = now ; // breaker open for 5 minutes
-    }
-
-    void reset() {
-        openUntil = -1;
-        failures.clear();
-    }
 }
-
-
