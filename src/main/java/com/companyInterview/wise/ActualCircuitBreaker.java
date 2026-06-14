@@ -41,7 +41,11 @@ public class ActualCircuitBreaker {
         List<String> requests = List.of(
                 "1,service_b/api,200",
                 "2,service_b/api,200",
-                "3,service_b/api,500"
+                "3,service_b/api,500",
+                "4,service_b/api,500",
+                "5,service_b/api,500",
+                "6,service_b/api,200",
+                "88,service_b/api,200"
         );
 
         List<String> results = handleRequests(requests);
@@ -115,39 +119,26 @@ public class ActualCircuitBreaker {
     public Response execute(Request request) throws Exception {
 
         int now = getCurrentTimeInMinutes();
-
         CircuitBreaker breaker = getBreaker(request.host);
-
-
         if (breaker.isOpen(now)) {
-
             // Circuit is OPEN — block the call
-
             Response blocked = new Response();
-
             blocked.status = 503;
-
             blocked.body = "Circuit open for host: " + request.host;
-
             return blocked;
-
         }
-
-
         // Circuit is CLOSED — make the actual call
-
-       Response response = request.call();
-
-
-        if (response.status == 500 /* or timeout */) {
-
+        try {
+            Response response = request.call();
+            if (response.status >= 500) {
+                breaker.recordFailure(now);
+            }
+            return response;
+        } catch (Exception e) {
+            // Timeout or connection error — also a failure
             breaker.recordFailure(now);
-
+            throw e;
         }
-
-
-        return response;
-
     }
 
 }
@@ -155,58 +146,33 @@ public class ActualCircuitBreaker {
 class CircuitBreaker {
 
     private static final int FAILURE_THRESHOLD = 3;
-
     private static final int FAILURE_WINDOW_MINUTES = 10;
-
     private static final int OPEN_DURATION_MINUTES = 5;
-
-
     private final Queue<Integer> failureTimes = new LinkedList<>();
-
     private Integer openedAtMinute = null;
 
-
     public boolean isOpen(int currentMinute) {
-
         if (openedAtMinute == null) return false;
-
-
         if (currentMinute - openedAtMinute >= OPEN_DURATION_MINUTES) {
-
             openedAtMinute = null;
-
             failureTimes.clear();
-
             return false;
-
         }
-
         return true;
-
     }
 
 
     public void recordFailure(int currentMinute) {
-
         // Evict failures outside the 10-minute sliding window
-
         while (!failureTimes.isEmpty() &&
-
                 currentMinute - failureTimes.peek() >= FAILURE_WINDOW_MINUTES) {
-
             failureTimes.poll();
-
         }
 
         failureTimes.offer(currentMinute);
 
-
         if (failureTimes.size() >= FAILURE_THRESHOLD) {
-
             openedAtMinute = currentMinute;
-
         }
-
     }
-
 }
