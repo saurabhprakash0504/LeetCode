@@ -1,17 +1,10 @@
 package com.companyInterview.wise;
 
-import com.practice.CircuitBreaker2;
-
-import java.io.*;
-import java.time.Clock;
 import java.time.LocalDateTime;
-import java.util.*;
-import java.text.*;
-import java.util.stream.*;
-import java.net.*;
-
-import static java.util.stream.Collectors.joining;
-import static java.util.stream.Collectors.toList;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.Map;
+import java.util.Queue;
 
 /*
 
@@ -26,6 +19,10 @@ import static java.util.stream.Collectors.toList;
 abstract class Request {
     String host;
 
+    public Request(String host) {
+        this.host = host;
+    }
+
     abstract Response call(); // This makes request to external server
 }
 
@@ -36,74 +33,76 @@ class Response {
 
 public class ActualCircuitBreaker {
 
-    public static void main(String[] args) throws IOException {
 
-        List<String> requests = List.of(
+    // Simulate time for testing
+    private int simulatedMinute = 0;
+
+    public static void main(String[] args) throws Exception {
+        System.out.println("=== Sample Input Test ===");
+        runTest(new String[]{
+                "3",
                 "1,service_b/api,200",
                 "2,service_b/api,200",
-                "3,service_b/api,500",
-                "4,service_b/api,500",
-                "5,service_b/api,500",
-                "6,service_b/api,200",
-                "88,service_b/api,200"
-        );
+                "3,service_b/api,500"
+        });
 
-        List<String> results = handleRequests(requests);
-        for (String status : results) {
-            System.out.println(status);
+        System.out.println("\n=== Full Circuit Breaker Scenario ===");
+        runTest(new String[]{
+                "9",
+                "1,service_b/api,200",   // success
+                "2,service_b/api,500",   // failure 1
+                "3,service_b/api,500",   // failure 2
+                "4,service_b/api,500",   // failure 3 → circuit OPENS
+                "5,service_b/api,200",   // BLOCKED (circuit open)
+                "7,service_c/api,200",   // service_c unaffected
+                "9,service_b/api,200",   // BLOCKED (only 5 min haven't passed since min 4)
+                "9,service_c/api,500",   // service_c independent breaker
+                "10,service_b/api,200"   // REOPENS (10 - 4 = 6 >= 5 min) → success
+        });
+    }
+
+    // ─── Test Runner ─────────────────────────────────────────────────────────
+
+    private static void runTest(String[] lines) throws Exception {
+        ActualCircuitBreaker client = new ActualCircuitBreaker();
+
+        int n = Integer.parseInt(lines[0].trim());
+
+        for (int i = 1; i <= n; i++) {
+            String[] parts = lines[i].split(",");
+            int minute = Integer.parseInt(parts[0].trim());
+            String host = parts[1].trim();
+            int statusCode = Integer.parseInt(parts[2].trim());
+
+            // Inject simulated time
+            client.simulatedMinute = minute;
+
+            // Build a fake Request that returns the prescribed status
+            Request request = new Request(host) {
+                @Override
+                public Response call() {
+                    Response r = new Response();
+                    r.status = statusCode;
+                    r.body = "body from " + host;
+                    return r;
+                }
+            };
+
+            Response response = client.execute(request);
+
+            String result = response.status == 503
+                    ? "BLOCKED  (circuit open)"
+                    : "status=" + response.status;
+
+            System.out.printf("min=%-3d  %-20s  →  %s%n", minute, host, result);
         }
     }
 
-    private static List<String> handleRequests(List<String> requests) {
-        ActualCircuitBreaker circuitBreaker = new ActualCircuitBreaker();
-        List<String> responseStatuses = new ArrayList<>();
-        for (String request : requests) {
-            String[] requestParts = request.split(",");
-            var requestTime = Integer.valueOf(requestParts[0].trim());
-            // Clock.setCurrentTime(requestTime);
-            var requestAPIHost = requestParts[1].trim();
-            var responseStatus = requestParts[2].trim();
-            var mockRequest = new MockRequest(requestAPIHost, Integer.valueOf(responseStatus));
-            try {
-                var response = circuitBreaker.execute(mockRequest);
-                responseStatuses.add(String.valueOf(response.status));
-            } catch (Exception ex) {
-                // Candidate can throw an exception or return 429 when web-client blocks the request
-                responseStatuses.add("429");
-            }
-        }
-        return responseStatuses;
-    }
-
-    // Mocked Request class to handle mocked responses
-    static class MockResponse extends Response {
-        public MockResponse(int status, String content) {
-            super.status = status;
-            super.body = content;
-        }
-    }
-
-
-    // Mocked Request class to handle request and response codes via test-cases
-    static class MockRequest extends Request {
-        int mockResponseCode;
-
-        public MockRequest(String host, int mockResponseCode) {
-            super.host = host;
-            this.mockResponseCode = mockResponseCode;
-        }
-
-        public Response call() {
-            try {
-                return new MockResponse(Integer.valueOf(this.mockResponseCode), null);
-            } catch (Exception e) {
-                return null;
-            }
-        }
-    }
 
     private int getCurrentTimeInMinutes() {
-        return LocalDateTime.now().getMinute();
+        //return LocalDateTime.now().getMinute();
+        //this is just for testing that I have used simulatedMinute
+        return simulatedMinute;
     }
 
     //
@@ -153,7 +152,7 @@ class CircuitBreaker {
 
     public boolean isOpen(int currentMinute) {
         if (openedAtMinute == null) return false;
-        if (currentMinute - openedAtMinute >= OPEN_DURATION_MINUTES) {
+        if (currentMinute - openedAtMinute > OPEN_DURATION_MINUTES) {
             openedAtMinute = null;
             failureTimes.clear();
             return false;
