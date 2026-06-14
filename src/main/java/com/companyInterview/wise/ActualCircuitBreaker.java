@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;
 import java.util.Queue;
+import java.util.concurrent.ConcurrentHashMap;
 
 /*
 
@@ -107,7 +108,7 @@ public class ActualCircuitBreaker {
 
     //
     //FROM HERE: Candidate's code to implement Circuit Breaker pattern
-    Map<String, CircuitBreaker> map = new HashMap<>();
+    Map<String, CircuitBreaker> map = new ConcurrentHashMap<>();
 
     private CircuitBreaker getBreaker(String host) {
         return map.computeIfAbsent(host, h -> new CircuitBreaker());
@@ -148,9 +149,9 @@ class CircuitBreaker {
     private static final int FAILURE_WINDOW_MINUTES = 10;
     private static final int OPEN_DURATION_MINUTES = 5;
     private final Queue<Integer> failureTimes = new LinkedList<>();
-    private Integer openedAtMinute = null;
+    private volatile Integer openedAtMinute = null;
 
-    public boolean isOpen(int currentMinute) {
+    public synchronized boolean isOpen(int currentMinute) {
         if (openedAtMinute == null) return false;
         if (currentMinute - openedAtMinute > OPEN_DURATION_MINUTES) {
             openedAtMinute = null;
@@ -161,7 +162,7 @@ class CircuitBreaker {
     }
 
 
-    public void recordFailure(int currentMinute) {
+    public synchronized void recordFailure(int currentMinute) {
         // Evict failures outside the 10-minute sliding window
         while (!failureTimes.isEmpty() &&
                 currentMinute - failureTimes.peek() >= FAILURE_WINDOW_MINUTES) {
