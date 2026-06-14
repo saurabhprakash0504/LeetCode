@@ -106,20 +106,22 @@ public class ActualCircuitBreaker {
         return simulatedMinute;
     }
 
+    /***
+     * ACTUAL IMPLEMENTATION FROM HERE
+     */
     //
     //FROM HERE: Candidate's code to implement Circuit Breaker pattern
-    Map<String, CircuitBreaker> map = new ConcurrentHashMap<>();
 
-    private CircuitBreaker getBreaker(String host) {
-        return map.computeIfAbsent(host, h -> new CircuitBreaker());
-    }
 
     //Write your code here
     //WE need to implement this logic in the `WebClient.execute(Request)` method. (CIRCUIT BREAKER)
     public Response execute(Request request) throws Exception {
 
         int now = getCurrentTimeInMinutes();
+
+        //get the circuit breaker for the host
         CircuitBreaker breaker = getBreaker(request.host);
+        //
         if (breaker.isOpen(now)) {
             // Circuit is OPEN — block the call
             Response blocked = new Response();
@@ -139,6 +141,20 @@ public class ActualCircuitBreaker {
             breaker.recordFailure(now);
             throw e;
         }
+    }
+
+    Map<String, CircuitBreaker> map = new ConcurrentHashMap<>();
+
+    private CircuitBreaker getBreaker(String host) {
+        //this is not thread safe
+/*        if (!map.containsKey(host)) {
+            map.put(host, new CircuitBreaker());
+        }
+        return map.get(host);*/
+
+        //this is thread safe
+        //The lambda h -> new CircuitBreaker() only runs if the key is absent.
+        return map.computeIfAbsent(host, h -> new CircuitBreaker());
     }
 
 }
