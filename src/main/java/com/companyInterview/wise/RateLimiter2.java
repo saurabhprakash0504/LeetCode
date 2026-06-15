@@ -8,7 +8,10 @@ import java.util.concurrent.locks.*;
 
 class RateLimiter2 {
 
-    private final Map<Integer, Deque<Integer>> userHistory = new ConcurrentHashMap<>();
+    //CLAUDE CODE
+
+    //THREAD SAFE
+   /* private final Map<Integer, Deque<Integer>> userHistory = new ConcurrentHashMap<>();
     private final Map<Integer, ReentrantLock> userLocks = new ConcurrentHashMap<>();
 
     public List<Integer> getRequests(List<Integer> user, List<Integer> time, int k, int t) {
@@ -58,6 +61,37 @@ class RateLimiter2 {
                 thread.join();
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
+            }
+        }
+
+        return result;
+    }*/
+
+    //NON THREAD SAFE
+    public static List<Integer> getRequests(List<Integer> user, List<Integer> time, int k, int t) {
+        int n = user.size();
+        List<Integer> result = new ArrayList<>(n);
+        Map<Integer, Deque<Integer>> userHistory = new HashMap<>();
+
+        for (int i = 0; i < n; i++) {
+            int currUserId = user.get(i);
+            int currTime = time.get(i);
+
+            userHistory.putIfAbsent(currUserId, new ArrayDeque<>());
+            Deque<Integer> history = userHistory.get(currUserId);
+
+            // Evict timestamps outside the window [currTime - t, currTime]
+            while (!history.isEmpty() && history.peekFirst() <= currTime - t) {
+                history.pollFirst();
+            }
+
+            // Allow if strictly fewer than k requests in the window
+            if (history.size() < k) {
+                result.add(1);
+                history.addLast(currTime);  // Only count allowed requests
+            } else {
+                result.add(0);
+                // Blocked requests are NOT added to history
             }
         }
 
