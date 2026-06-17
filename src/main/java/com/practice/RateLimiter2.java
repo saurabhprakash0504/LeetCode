@@ -1,10 +1,6 @@
 package com.practice;
 
-import com.companyInterview.wise.RateLimiter;
-
-import java.util.HashMap;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.atomic.AtomicLong;
 
 public class RateLimiter2 {
 
