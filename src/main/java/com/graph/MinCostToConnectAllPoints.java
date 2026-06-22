@@ -13,132 +13,64 @@ public class MinCostToConnectAllPoints {
     }
 
     public int minCostConnectPoints(int[][] points) {
+        int size = points.length;
+        ArrayList<ArrayList<int[]>> adj = createAdjList(points, size);
 
-        int V = points.length;
+        PriorityQueue<int[]> pq = new PriorityQueue<int[]>((t1, t2) -> t1[1] - t2[1]);
+        pq.add(new int[]{0, 0});
+        boolean[] vis = new boolean[size];
+        int[] parent = new int[size];
+        int cost = 0;
+        parent[0] = -1;
+        int count = 0;
 
-        ArrayList<Krus> al = new ArrayList<>();
+        while (!pq.isEmpty()) {
+            int[] poll = pq.poll();
+            int wt = poll[1];
+            int node = poll[0];
 
+            if (vis[node] == false) {
+                count = count + 1;
+                vis[node] = true;
 
-        // build edges
-
-        for (int i = 0; i < V; i++) {
-
-            for (int j = i + 1; j < V; j++) {
-
-                int dist = Math.abs(points[i][0] - points[j][0]) +
-
-                        Math.abs(points[i][1] - points[j][1]);
-
-
-                al.add(new Krus(dist, new Temp4(i, j)));
-
-            }
-
-        }
-
-        return kruskalsMST(V, al);
-
-    }
-
-    int kruskalsMST(int V, ArrayList<Krus> al) {
-        // code here
-       /* ArrayList<Krus> al = new ArrayList<>();
-        for(int i=0;i< edges.length;i++){
-
-            al.add(new Krus(edges[i][2], new Temp(edges[i][0], edges[i][1])));
-        }*/
-
-        Collections.sort(al, (a, b) -> a.wt - b.wt);
-
-        Disjoint ds = new Disjoint(V);
-
-        int res = 0;
-        for (Krus k : al) {
-            Temp4 t = k.temp;
-            if (ds.findParent(t.u) != ds.findParent(t.v)) {
-                res = res + k.wt;
-                ds.findSize(t.u, t.v);
+                cost = cost + wt;
+                if (count == size) {
+                    return cost;
+                }
+                ArrayList<int[]> neigh = adj.get(node);
+                for (int[] n : neigh) {
+                    int to = n[0];
+                    int w = n[1];
+                    if (vis[to] == false) {
+                        pq.add(new int[]{to, w});
+                        parent[to] = node;
+                    }
+                }
             }
         }
 
-        return res;
-    }
-}
+        return cost;
 
-
-class Disjoint {
-
-    ArrayList<Integer> size = new ArrayList<>();
-    ArrayList<Integer> parent = new ArrayList<>();
-
-    Disjoint(int v) {
-
-        for (int i = 0; i <= v; i++) {
-            size.add(i, 1);
-            parent.add(i, i);
-        }
     }
 
+    ArrayList<ArrayList<int[]>> createAdjList(int[][] points, int size) {
 
-    int findParent(int i) {
+        ArrayList<ArrayList<int[]>> adj = new ArrayList<>();
 
-        if (i == parent.get(i)) {
-            return i;
+        for (int i = 0; i < size; i++) {
+            adj.add(new ArrayList<int[]>());
         }
 
-        int par = findParent(parent.get(i));
-
-        parent.set(i, par);
-
-        return parent.get(i);
-    }
-
-
-    void findSize(int u, int v) {
-
-        int par_u = findParent(u);
-        int par_v = findParent(v);
-
-        int size_par_u = size.get(par_u);
-        int size_par_v = size.get(par_v);
-
-        if (par_u == par_v) {
-            return;
-        } else if (size_par_u > size_par_v) {
-            size.set(par_u, size_par_u + size_par_v);
-            parent.set(par_v, par_u);
-        } else {
-            size.set(par_v, size_par_v + size_par_u);
-            parent.set(par_u, par_v);
+        for (int i = 0; i < points.length; i++) {
+            for (int j = 0; j < points.length; j++) {
+                int dis = Math.abs(points[i][0] - points[j][0]) + Math.abs(points[i][1] - points[j][1]);
+                adj.get(i).add(new int[]{j, dis});
+                adj.get(j).add(new int[]{i, dis});
+            }
         }
 
-
+        return adj;
     }
 
+
 }
-
-class Krus {
-
-    int wt;
-    Temp4 temp;
-
-    Krus(int w, Temp4 t) {
-
-        wt = w;
-        temp = t;
-
-    }
-}
-
-class Temp4 {
-
-    int u;
-    int v;
-
-    Temp4(int uu, int vv) {
-        u = uu;
-        v = vv;
-    }
-}
-
-
