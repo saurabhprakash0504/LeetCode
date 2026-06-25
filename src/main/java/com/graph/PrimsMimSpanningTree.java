@@ -5,7 +5,19 @@ import java.util.*;
 public class PrimsMimSpanningTree {
 
     public static void main(String[] args) {
+        PrimsMimSpanningTree obj = new PrimsMimSpanningTree();
+        int V = 5;
+        int[][] edges = {
+                {0, 1, 2},
+                {0, 2, 4},
+                {1, 2, 1},
+                {1, 3, 7},
+                {2, 4, 3},
+                {3, 4, 1}
+        };
 
+        int result = obj.spanningTree(V, edges);
+        System.out.println("Minimum Spanning Tree cost: " + result);
     }
 
     public int spanningTree(int V, int[][] edges) {
