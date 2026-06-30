@@ -15,7 +15,8 @@
             Arrays.sort(courses, (a, b) -> a[1] != b[1] ? a[1] - b[1] : a[0] - b[0]);
             PriorityQueue<int[]> pq = new PriorityQueue<int[]>((a, b) -> b[0] - a[0]);
             int start = 0;
-            for (int i = 0; i < courses.length; i++) {
+            for (int i = 0; i < courses.length
+                    ; i++) {
                 if (start + courses[i][0] <= courses[i][1]) {
                     pq.add(courses[i]);
                     start = start + courses[i][0];
