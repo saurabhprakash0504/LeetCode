@@ -2,6 +2,7 @@ package com.array;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 
 public class MajorityElement2 {
 
@@ -11,64 +12,48 @@ public class MajorityElement2 {
         System.out.println(me2.findMajority(arr));
     }
 
-    public ArrayList<Integer> findMajority(int[] arr) {
+    public List<Integer> findMajority(int[] arr) {
 
-        ArrayList<Integer> finalList = new ArrayList<Integer>();
-
-        find(arr, finalList);
+        List<Integer> finalList = majorityElement(arr);
 
         return finalList;
     }
 
-    void find(int[] arr, ArrayList<Integer> finalList) {
+    public List<Integer> majorityElement(int[] nums) {
+        int first = 0, second = 0;
+        int firstC = 0, secondC = 0;
 
-        int ele1 = -1;
-        int count1 = 0;
-
-        int ele2 = -1;
-        int count2 = 0;
-
-        for (int a : arr) {
-
-            if (ele1 == a) {
-                count1++;
-            } else if (ele2 == a) {
-                count2++;
-            } else if (count1 == 0 && ele2 != a) {
-                count1 = 1;
-                ele1 = a;
-
-            } else if (count2 == 0 && ele1 != a) {
-                count2 = 1;
-                ele2 = a;
-
+        for (int n : nums) {
+            if (n == first) {
+                firstC++;
+            } else if (n == second) {
+                secondC++;
+            } else if (firstC == 0) {
+                first = n;
+                firstC = 1;
+            } else if (secondC == 0) {
+                second = n;
+                secondC = 1;
             } else {
-                count1--;
-                count2--;
+                firstC--;
+                secondC--;
             }
-
         }
 
-        count1 = 0;
-        count2 = 0;
-        for (int i = 0; i < arr.length; i++) {
-            if (arr[i] == ele1) {
-                count1++;
-            } else if (arr[i] == ele2) {
-                count2++;
-            }
-
+        // verify
+        firstC = 0;
+        secondC = 0;
+        for (int n : nums) {
+            if (n == first) firstC++;
+            else if (n == second) secondC++;
         }
 
-        if (count1 > arr.length / 3) {
-            finalList.add(ele1);
-        }
-        if (count2 > arr.length / 3) {
-            finalList.add(ele2);
-        }
+        List<Integer> res = new ArrayList<>();
+        int limit = nums.length / 3;
 
-        Collections.sort(finalList);
+        if (firstC > limit) res.add(first);
+        if (secondC > limit) res.add(second);
 
-
+        return res;
     }
 }
