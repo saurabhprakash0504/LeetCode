@@ -166,21 +166,44 @@ public class LongestIncreasingSubSequence {
         return prev[0];
     }
 
+    //TODO:: Using Binary seach tree
+    static public int findDPBinarySearch(int[] nums) {
+        if (nums.length == 0) {
+            return 0;
+        }
+        ArrayList<Integer> al = new ArrayList<Integer>();
+        al.add(nums[0]);
+        for (int i = 1; i < nums.length; i++) {
 
-    static int findDPBinarySearch(int[] arr) {
-        ArrayList<Integer> al = new ArrayList<>();
-        for (int x : arr) {
-            int i = Collections.binarySearch(al, x);
-            if (i < 0) {
-                i = -(i + 1);
+            if (al.get(al.size() - 1) < nums[i]) {
+                al.add(nums[i]);
+            } else {
+                int lowestInd = binarySearch(al, nums[i]);
+                if (lowestInd != -1) {
+                    al.set(lowestInd, nums[i]);
+                }
             }
 
-            if (i == al.size()) {
-                al.add(x);
+        }
+
+        return al.size();
+    }
+
+    static int binarySearch(ArrayList<Integer> al, int num) {
+        int start = 0;
+        int end = al.size() - 1;
+        int ind = -1;
+        while (start <= end) {
+            int mid = start + (end - start) / 2;
+            if (al.get(mid) >= num) {
+                ind = mid;
+                end = mid - 1;
             } else {
-                al.set(i, x);
+
+                start = mid + 1;
             }
         }
-        return al.size();
+
+        return ind;
     }
 }
