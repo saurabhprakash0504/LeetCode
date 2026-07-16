@@ -121,7 +121,7 @@ public class ActualCircuitBreaker {
 
         //get the circuit breaker for the host
         CircuitBreaker breaker = getBreaker(request.host);
-        //
+
         if (breaker.isOpen(now)) {
             // Circuit is OPEN — block the call
             Response blocked = new Response();
