@@ -114,7 +114,10 @@ public class ActualCircuitBreaker {
 
 
     //TODO::Write your code here
+    //TODO:: THIS BELOW CODE IS VALIDATED
     //WE need to implement this logic in the `WebClient.execute(Request)` method. (CIRCUIT BREAKER)
+    Map<String, CircuitBreaker> map = new ConcurrentHashMap<>();
+
     public Response execute(Request request) throws Exception {
 
         int now = getCurrentTimeInMinutes();
@@ -143,7 +146,6 @@ public class ActualCircuitBreaker {
         }
     }
 
-    Map<String, CircuitBreaker> map = new ConcurrentHashMap<>();
 
     private CircuitBreaker getBreaker(String host) {
         //this is not thread safe
