@@ -6,36 +6,54 @@ public class PermutationOfAString {
 
     public static void main(String[] args) {
         PermutationOfAString ps = new PermutationOfAString();
-        ArrayList<String> res = ps.findPermutation("abc");
-        System.out.println(res);
+        ArrayList<String> permutations = ps.getPermutations("abc");
+        System.out.println(permutations);
     }
 
-    public ArrayList<String> findPermutation(String s) {
+    /**
+     * Returns all permutations of the given string.
+     */
+    public ArrayList<String> getPermutations(String input) {
 
-        ArrayList<String> list = new ArrayList<>();
-        char[] arr = s.toCharArray();
-        find(arr, 0, list);
-        return list;
+        ArrayList<String> result = new ArrayList<>();
+        char[] chars = input.toCharArray();
+
+        generate(chars, 0, result);
+        return result;
     }
 
-    void find(char[] arr, int ind,ArrayList<String> list){
+    /**
+     * Recursively generates permutations by fixing one position at a time.
+     */
+    private void generate(char[] chars, int fixedIndex, ArrayList<String> result) {
 
-        if(ind == arr.length){
-            list.add(String.valueOf(arr));
+        // Base case: all positions fixed → we have a complete permutation
+        if (fixedIndex == chars.length) {
+            result.add(String.valueOf(chars));
             return;
         }
 
-        for(int i=ind;i<arr.length;i++){
-            swap(arr, i, ind);
-            find(arr, ind+1,list);
-            swap(arr, i, ind);
-        }
+        // Try each index as a candidate to swap into the fixed position
+        for (int swapIndex = fixedIndex; swapIndex < chars.length; swapIndex++) {
 
+            // Swap the candidate into the fixed position
+            swap(chars, swapIndex, fixedIndex);
+
+            // Recurse to fix the next position
+            generate(chars, fixedIndex + 1, result);
+
+            // Backtrack: restore original order
+            swap(chars, swapIndex, fixedIndex);
+        }
     }
 
-    void swap(char[] arr, int i, int j) {
-        char temp = arr[i];
-        arr[i] = arr[j];
-        arr[j] = temp;
+    /**
+     * Swaps two characters in the array.
+     */
+    private void swap(char[] chars, int a, int b) {
+        char temp = chars[a];
+        chars[a] = chars[b];
+        chars[b] = temp;
     }
 }
+
