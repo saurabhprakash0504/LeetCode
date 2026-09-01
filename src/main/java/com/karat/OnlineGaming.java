@@ -149,9 +149,9 @@ class GameManager {
 
     //TODO::Implement the getHeadToHead function below
     HeadToHead getHeadToHead(Integer player1, Integer player2) {
-        //SORT the matchResults by timestamp in descending order to find the last match easily
+        //SORT the matchResults by timestamp in ascending order to find the last match easily
 
-        matchResults.sort((a, b) -> a.timestamp - b.timestamp);
+     //   matchResults.sort((a, b) -> a.timestamp - b.timestamp);
         int winsPlayer1 = 0;
         int winsPlayer2 = 0;
         int draws = 0;
