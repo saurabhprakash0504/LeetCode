@@ -160,7 +160,7 @@ public class ShoppingCart {
         System.out.println(shopping(products, list5)); //=> 0
 
     }
-
+    //TODO: Implement the shopping method below
     static int shopping(String[][] mat, String[] list1) {
 
         HashMap<String, String> map = new HashMap<String, String>();
