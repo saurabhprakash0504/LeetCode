@@ -7,6 +7,11 @@ import java.io.*;
 import java.util.*;
 //import javafx.util.Pair;
 
+/**
+ * THIS QUESTION WAS ASKED IN THE FIRST ROUND OF THE INTERVIEW.
+ * MY JOB WAS TO SOLVE THIS PROBLEM.
+ */
+
 /*
 
 You are running a classroom and suspect that some of your students are passing around the answer to a multiple-choice question in 2D grids of letters. The word may start anywhere in the grid, and consecutive letters can be either immediately below or immediately to the right of the previous letter.
