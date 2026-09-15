@@ -15,55 +15,58 @@ public class MinDistanceBetweenTwoNodesInBinaryTree {
         // code here
         Node lca = findLCA(root, a, b);
         //  System.out.println("lca "+ lca.data);
-        int d1 = dis(lca, a);
-        int d2 = dis(lca, b);
+        int d1 = findDis(lca, a);
+        int d2 = findDis(lca, b);
         return d1 + d2;
     }
 
-    Node findLCA(Node root, int a , int b){
-        if(root == null){
+    Node findLCA(Node root, int a, int b) {
+        if (root == null) {
             return root;
         }
 
-        if(root.data == a || root.data == b){
+        if (root.data == a || root.data == b) {
             return root;
         }
 
         Node left = findLCA(root.left, a, b);
-        Node right = findLCA(root.right, a,b);
-        if(left != null && right != null){
+        Node right = findLCA(root.right, a, b);
+        if (left != null && right != null) {
             return root;
-        }else if(left == null && right != null){
+        } else if (left == null && right != null) {
             return right;
-        }else {
+        } else {
             return left;
         }
 
     }
 
 
-    int dis(Node root, int target) {
+    int findDis(Node root, int a) {
         if (root == null) {
-            return -1; // not found
+            return -1;
         }
 
-        if (root.data == target) {
-            return 0; // found
+        if (root.data == a) {
+            return 0;
         }
 
-        int leftDistance = dis(root.left, target);
+        int left = findDis(root.left, a);
+        int right = findDis(root.right, a);
 
-        if (leftDistance != -1) {
-            return leftDistance + 1;
+
+        if (left == -1 && right == -1) {
+            return -1;
         }
 
-        int rightDistance = dis(root.right, target);
+        if (left == -1) {
+            return right + 1;
 
-        if (rightDistance != -1) {
-            return rightDistance + 1;
+        } else {
+
+            return left + 1;
         }
 
-        return -1; // not found in either subtree
     }
 
 }
