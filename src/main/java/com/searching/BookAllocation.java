@@ -10,45 +10,49 @@ public class BookAllocation {
     }
 
     public int findPages(int[] arr, int k) {
+        // code here
         if (k > arr.length) {
             return -1;
         }
-        int s = 0;
-        int e = 0;
-        for (int i = 0; i < arr.length; i++) {
-            e = e + arr[i];
+
+        //make sum as long as the value could be huge
+        long sum = 0;
+
+        for (int i : arr) {
+            sum = sum + i;
+
         }
 
-        int m = s + (e - s) / 2;
-
-        int res = -1;
-        while (s <= e) {
-            if (isPossible(arr, k, m)) {
-                res = m;
-                e = m - 1;
+        long l = 0;
+        long h = sum;
+        long ans = -1;
+        while (l <= h) {
+            long m = l + (h - l) / 2;
+            if (isValid(arr, k, m)) {
+                ans = m;
+                h = m - 1;
             } else {
-                s = m + 1;
+                l = m + 1;
             }
-            m = s + (e - s) / 2;
         }
-        return res;
+
+        return (int) ans;
     }
 
-    boolean isPossible(int[] arr, int stu, int m) {
+    boolean isValid(int[] arr, int k, long m) {
 
-        int stuC = 1;
-        int pageS = 0;
-
+        int student = 1;
+        int currVal = 0;
         for (int i = 0; i < arr.length; i++) {
-            if (pageS + arr[i] <= m) {
-                pageS = pageS + arr[i];
+            int temp = currVal + arr[i];
+            if (temp <= m) {
+                currVal = temp;
             } else {
-                stuC++;
-                if (stuC > stu || arr[i] > m) {
+                student++;
+                if (student > k || arr[i] > m) {
                     return false;
                 }
-                pageS = 0;
-                pageS = arr[i];
+                currVal = arr[i];
             }
         }
         return true;
