@@ -71,9 +71,7 @@ public class MinDistanceBetweenTwoNodesInBinaryTree {
 
         if (left == -1) {
             return right + 1;
-
         } else {
-
             return left + 1;
         }
 
