@@ -17,11 +17,13 @@ public class MedianOf2SortedArray {
 
         int n = n1 + n2;
         int left = (n + 1) / 2;         // size of the left half
+        int right = n - left;
         int low = 0, high = n1;
 
         while (low <= high) {
-            int mid1 = (low + high) >>> 1;                // elements taken from a for the left half
-            int mid2 = left - mid1;                       // elements taken from b for the left half
+            int mid1 = (low + high) / 2;                // elements taken from a for the left half
+            //  int mid2 = left - mid1;                       // elements taken from b for the left half
+            int mid2 = n2 - (right - (n1 - mid1));
 
             int l1 = Integer.MIN_VALUE, l2 = Integer.MIN_VALUE;
             int r1 = Integer.MAX_VALUE, r2 = Integer.MAX_VALUE;
