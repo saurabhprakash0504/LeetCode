@@ -5,22 +5,19 @@ public class SearchInSortedRotatedArray {
     public static void main(String[] args) {
         SearchInSortedRotatedArray obj = new SearchInSortedRotatedArray();
         int[] arr = {4, 5, 6, 7, 0, 1, 2};
-        int key = 0;
+        int key = 4;
         System.out.println(obj.search(arr, key));
     }
 
     int search(int[] arr, int key) {
-        // code here
-        int pivot = findPivot(arr);
 
+        int pivot = findPivot(arr);
 
         if (key >= arr[pivot] && key <= arr[arr.length - 1]) {
             return findInd(arr, pivot, arr.length - 1, key);
         } else {
             return findInd(arr, 0, pivot - 1, key);
         }
-        // System.out.println("pivot "+ pivot );
-        //  return pivot;
     }
 
     int findPivot(int[] arr) {
