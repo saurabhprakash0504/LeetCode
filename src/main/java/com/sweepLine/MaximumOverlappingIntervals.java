@@ -48,15 +48,3 @@ public class MaximumOverlappingIntervals {
         return max;
     }
 }
-
-class Temp {
-
-    int ind;
-    boolean isStart;
-
-    Temp(int i, boolean isS) {
-        ind = i;
-        isStart = isS;
-    }
-
-}
