@@ -12,54 +12,45 @@ public class MaximumPopulationYear {
         System.out.println(result); // Output: 1995
     }
 
-    public int maximumPopulation(int[][] arr) {
-        ArrayList<Temp> al = new ArrayList<>();
-        for (int i = 0; i < arr.length; i++) {
-            int start = arr[i][0];
-            int end = arr[i][1];
-            al.add(new Temp(start, true));
-            al.add(new Temp(end, false));
+    public int maximumPopulation(int[][] logs) {
+        ArrayList<Temp2> al = new ArrayList<>();
+        for (int i = 0; i < logs.length; i++) {
+            al.add(new Temp2(logs[i][0], 1));
+            al.add(new Temp2(logs[i][1], -1));
         }
 
-        java.util.Collections.sort(al, (t1, t2) -> {
-            int indexCompare = Integer.compare(t1.ind, t2.ind);
+        Collections.sort(al, (a1, a2) -> {
 
-            if (indexCompare != 0) {
-                return indexCompare;
+            int val = Integer.compare(a1.year, a2.year);
+            if (val == 0) {
+                return Integer.compare(a1.delta, a2.delta);
+            } else {
+                return val;
             }
-
-            return Boolean.compare(t1.isStart, t2.isStart);
         });
 
-        int max = 0;
         int curr = 0;
-        int val = 0;
+        int max = 0;
+        int year = 0;
         for (int i = 0; i < al.size(); i++) {
-            if (al.get(i).isStart == true) {
-                curr = curr + 1;
-
-            } else {
-                curr = curr - 1;
-            }
-            if (max < curr) {
-                val = al.get(i).ind;
+            curr = curr + al.get(i).delta;
+            if (curr > max) {
                 max = curr;
+                year = al.get(i).year;
             }
-            // max = Integer.max(curr, max);
         }
 
-        return val;
+        return year;
     }
 }
 
-class Temp {
+class Temp2 {
 
-    int ind;
-    boolean isStart;
+    int year;
+    int delta;
 
-    Temp(int i, boolean isS) {
-        ind = i;
-        isStart = isS;
+    Temp2(int y, int d) {
+        year = y;
+        delta = d;
     }
-
 }

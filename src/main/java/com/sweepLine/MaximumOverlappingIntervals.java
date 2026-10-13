@@ -23,7 +23,7 @@ public class MaximumOverlappingIntervals {
         }
 
         Collections.sort(al, (t1, t2) -> {
-            int indexCompare = Integer.compare(t1.ind, t2.ind);
+            int indexCompare = Integer.compare(t1.year, t2.year);
 
             if (indexCompare != 0) {
                 return indexCompare;
@@ -46,5 +46,16 @@ public class MaximumOverlappingIntervals {
         }
 
         return max;
+    }
+}
+
+class Temp {
+
+    int year;
+    boolean isStart;
+
+    Temp(int y, boolean d) {
+        year = y;
+        isStart = d;
     }
 }
