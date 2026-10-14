@@ -18,30 +18,37 @@ public class IntervalListIntersections {
     }
 
     public int[][] intervalIntersection(int[][] firstList, int[][] secondList) {
-        ArrayList<int[]> res = new ArrayList<>();
         int i = 0;
         int j = 0;
-        while (i < firstList.length && j < secondList.length) {
+        int len1 = firstList.length;
+        int len2 = secondList.length;
+        ArrayList<int[]> list = new ArrayList<>();
+        while (i < len1 && j < len2) {
 
-            if (secondList[j][0] <= firstList[i][1] && firstList[i][0] <= secondList[j][1]) {
-                int start = Math.max(firstList[i][0], secondList[j][0]);
-                int end = Math.min(firstList[i][1], secondList[j][1]);
-                res.add(new int[]{start, end});
+            int firstStart = firstList[i][0];
+            int firstEnd = firstList[i][1];
+            int secStart = secondList[j][0];
+            int secEnd = secondList[j][1];
+
+            if (firstEnd >= secStart || secEnd >= firstStart) {
+                int start = Integer.max(firstStart, secStart);
+                int end = Integer.min(firstEnd, secEnd);
+                if (start <= end)
+                    list.add(new int[]{start, end});
             }
 
-
-            if (firstList[i][1] <= secondList[j][1]) {
+            if (firstEnd <= secEnd) {
                 i++;
             } else {
                 j++;
             }
         }
 
-        int[][] arr = new int[res.size()][2];
-        for (int ii = 0; ii < res.size(); ii++) {
-            arr[ii][0] = res.get(ii)[0];
-            arr[ii][1] = res.get(ii)[1];
+        int[][] res = new int[list.size()][2];
+        for (int ii = 0; ii < list.size(); ii++) {
+            res[ii] = list.get(ii);
         }
-        return arr;
+
+        return res;
     }
 }
